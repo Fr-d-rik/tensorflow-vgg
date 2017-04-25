@@ -4,12 +4,10 @@ import skimage.transform
 import numpy as np
 
 
-# synset = [l.strip() for l in open('synset.txt').readlines()]
 
-
-# returns image of shape [224, 224, 3]
+# returns image of shape [res[0], res[1], 3]
 # [height, width, depth]
-def load_image(path):
+def load_image(path, res=(224, 224)):
     # load image
     img = skimage.io.imread(path)
     img = img / 255.0
@@ -21,7 +19,7 @@ def load_image(path):
     xx = int((img.shape[1] - short_edge) / 2)
     crop_img = img[yy: yy + short_edge, xx: xx + short_edge]
     # resize to 224, 224
-    resized_img = skimage.transform.resize(crop_img, (224, 224))
+    resized_img = skimage.transform.resize(crop_img, res, mode='constant')
     return resized_img
 
 

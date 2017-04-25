@@ -43,27 +43,40 @@ class Vgg16:
         ])
         assert bgr.get_shape().as_list()[1:] == [224, 224, 3]
 
-        self.conv1_1 = self.conv_layer(bgr, "conv1_1")
-        self.conv1_2 = self.conv_layer(self.conv1_1, "conv1_2")
+        self.conv1_1_lin = self.conv_layer(bgr, "conv1_1")
+        self.conv1_1 = tf.nn.relu(self.conv1_1_lin)
+        self.conv1_2_lin = self.conv_layer(self.conv1_1, "conv1_2")
+        self.conv1_2 = tf.nn.relu(self.conv1_2_lin)
         self.pool1 = self.max_pool(self.conv1_2, 'pool1')
 
-        self.conv2_1 = self.conv_layer(self.pool1, "conv2_1")
-        self.conv2_2 = self.conv_layer(self.conv2_1, "conv2_2")
+        self.conv2_1_lin = self.conv_layer(self.pool1, "conv2_1")
+        self.conv2_1 = tf.nn.relu(self.conv2_1_lin)
+        self.conv2_2_lin = self.conv_layer(self.conv2_1, "conv2_2")
+        self.conv2_2 = tf.nn.relu(self.conv2_2_lin)
         self.pool2 = self.max_pool(self.conv2_2, 'pool2')
 
-        self.conv3_1 = self.conv_layer(self.pool2, "conv3_1")
-        self.conv3_2 = self.conv_layer(self.conv3_1, "conv3_2")
-        self.conv3_3 = self.conv_layer(self.conv3_2, "conv3_3")
+        self.conv3_1_lin = self.conv_layer(self.pool2, "conv3_1")
+        self.conv3_1 = tf.nn.relu(self.conv3_1_lin)
+        self.conv3_2_lin = self.conv_layer(self.conv3_1, "conv3_2")
+        self.conv3_2 = tf.nn.relu(self.conv3_2_lin)
+        self.conv3_3_lin = self.conv_layer(self.conv3_2, "conv3_3")
+        self.conv3_3 = tf.nn.relu(self.conv3_3_lin)
         self.pool3 = self.max_pool(self.conv3_3, 'pool3')
 
-        self.conv4_1 = self.conv_layer(self.pool3, "conv4_1")
-        self.conv4_2 = self.conv_layer(self.conv4_1, "conv4_2")
-        self.conv4_3 = self.conv_layer(self.conv4_2, "conv4_3")
+        self.conv4_1_lin = self.conv_layer(self.pool3, "conv4_1")
+        self.conv4_1 = tf.nn.relu(self.conv4_1_lin)
+        self.conv4_2_lin = self.conv_layer(self.conv4_1, "conv4_2")
+        self.conv4_2 = tf.nn.relu(self.conv4_2_lin)
+        self.conv4_3_lin = self.conv_layer(self.conv4_2, "conv4_3")
+        self.conv4_3 = tf.nn.relu(self.conv4_3_lin)
         self.pool4 = self.max_pool(self.conv4_3, 'pool4')
 
-        self.conv5_1 = self.conv_layer(self.pool4, "conv5_1")
-        self.conv5_2 = self.conv_layer(self.conv5_1, "conv5_2")
-        self.conv5_3 = self.conv_layer(self.conv5_2, "conv5_3")
+        self.conv5_1_lin = self.conv_layer(self.pool4, "conv5_1")
+        self.conv5_1 = tf.nn.relu(self.conv5_1_lin)
+        self.conv5_2_lin = self.conv_layer(self.conv5_1, "conv5_2")
+        self.conv5_2 = tf.nn.relu(self.conv5_2_lin)
+        self.conv5_3_lin = self.conv_layer(self.conv5_2, "conv5_3")
+        self.conv5_3 = tf.nn.relu(self.conv5_3_lin)
         self.pool5 = self.max_pool(self.conv5_3, 'pool5')
 
         self.fc6 = self.fc_layer(self.pool5, "fc6")
@@ -93,10 +106,9 @@ class Vgg16:
             conv = tf.nn.conv2d(bottom, filt, [1, 1, 1, 1], padding='SAME')
 
             conv_biases = self.get_bias(name)
-            bias = tf.nn.bias_add(conv, conv_biases)
+            biased_conv = tf.nn.bias_add(conv, conv_biases)
 
-            relu = tf.nn.relu(bias)
-            return relu
+            return biased_conv
 
     def fc_layer(self, bottom, name):
         with tf.variable_scope(name):

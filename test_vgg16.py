@@ -1,11 +1,14 @@
 import numpy as np
 import tensorflow as tf
-
-from tensoflow_vgg import vgg16
-from tensoflow_vgg import utils
+import vgg16
+import utils
 
 img1 = utils.load_image("./test_data/tiger.jpeg")
 img2 = utils.load_image("./test_data/puzzle.jpeg")
+
+
+print(img1.min())
+print(img1.max())
 
 batch1 = img1.reshape((1, 224, 224, 3))
 batch2 = img2.reshape((1, 224, 224, 3))
