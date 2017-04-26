@@ -1,11 +1,10 @@
 import inspect
 import os
-
 import numpy as np
 import tensorflow as tf
 import time
 
-VGG_MEAN = [103.939, 116.779, 123.68]
+# VGG_MEAN = [103.939, 116.779, 123.68]
 
 
 class Vgg16:
@@ -18,32 +17,24 @@ class Vgg16:
             print(path)
 
         self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
-        print("npy file loaded")
+        self.imagenet_mean = [123.68, 116.779, 103.939]  # in RGB format
 
-    def build(self, rgb):
-        """
-        load variable from npy to build the VGG
+    def build(self, rgb, rescale=255.0):
 
-        :param rgb: rgb image [batch, height, width, 3] values scaled [0, 1]
-        """
 
-        start_time = time.time()
-        print("build model started")
-        rgb_scaled = rgb * 255.0
+        self.rgb_scaled = rgb * rescale
 
         # Convert RGB to BGR
-        red, green, blue = tf.split(axis=3, num_or_size_splits=3, value=rgb_scaled)
+        red, green, blue = tf.split(axis=3, num_or_size_splits=3, value=self.rgb_scaled)
         assert red.get_shape().as_list()[1:] == [224, 224, 1]
         assert green.get_shape().as_list()[1:] == [224, 224, 1]
         assert blue.get_shape().as_list()[1:] == [224, 224, 1]
-        bgr = tf.concat(axis=3, values=[
-            blue - VGG_MEAN[0],
-            green - VGG_MEAN[1],
-            red - VGG_MEAN[2],
-        ])
-        assert bgr.get_shape().as_list()[1:] == [224, 224, 3]
+        self.bgr_normed = tf.concat(axis=3, values=[blue - self.imagenet_mean[2],
+                                                    green - self.imagenet_mean[1],
+                                                    red - self.imagenet_mean[0]])
+        assert self.bgr_normed.get_shape().as_list()[1:] == [224, 224, 3]
 
-        self.conv1_1_lin = self.conv_layer(bgr, "conv1_1")
+        self.conv1_1_lin = self.conv_layer(self.bgr_normed, "conv1_1")
         self.conv1_1 = tf.nn.relu(self.conv1_1_lin)
         self.conv1_2_lin = self.conv_layer(self.conv1_1, "conv1_2")
         self.conv1_2 = tf.nn.relu(self.conv1_2_lin)
@@ -91,7 +82,6 @@ class Vgg16:
         self.prob = tf.nn.softmax(self.fc8, name="prob")
 
         self.data_dict = None
-        print(("build model finished: %ds" % (time.time() - start_time)))
 
     def avg_pool(self, bottom, name):
         return tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
