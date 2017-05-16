@@ -50,9 +50,7 @@ class Vgg16:
         conv5_3 = self.conv_layer(conv5_2, "conv5_3")
         pool5 = max_pool(conv5_3, 'pool5')
 
-        fc6 = self.fc_layer(pool5, "fc6")
-        assert fc6.get_shape().as_list()[1:] == [4096]
-        relu6 = tf.nn.relu(fc6)
+        relu6, _ = self.fc_layer(pool5, "fc6")
 
         relu7, _ = self.fc_layer(relu6, "fc7")
 
