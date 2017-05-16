@@ -54,10 +54,9 @@ class Vgg16:
         assert fc6.get_shape().as_list()[1:] == [4096]
         relu6 = tf.nn.relu(fc6)
 
-        fc7 = self.fc_layer(relu6, "fc7")
-        relu7 = tf.nn.relu(fc7)
+        relu7, _ = self.fc_layer(relu6, "fc7")
 
-        fc8 = self.fc_layer(relu7, "fc8")
+        _, fc8 = self.fc_layer(relu7, "fc8")
 
         tf.nn.softmax(fc8, name="prob")
 
@@ -87,9 +86,9 @@ class Vgg16:
             weights = tf.constant(self.data_dict[name][0], name="weights")
             biases = tf.constant(self.data_dict[name][1], name="biases")
 
-            fc = tf.nn.bias_add(tf.matmul(x, weights), biases)
-
-            return fc
+            fc = tf.nn.bias_add(tf.matmul(x, weights), biases, name='lin')
+            relu = tf.nn.relu(fc, name='relu')
+            return relu, fc
 
 
 def max_pool(bottom, name):
