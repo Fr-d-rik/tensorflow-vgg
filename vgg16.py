@@ -11,12 +11,11 @@ class Vgg16:
             path = os.path.abspath(os.path.join(path, os.pardir))
             path = os.path.join(path, "vgg16.npy")
             vgg16_npy_path = path
-            print(path)
 
         self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
         self.imagenet_mean = [123.68, 116.779, 103.939]  # in RGB format
 
-    def build(self, rgb, rescale=255.0):
+    def build(self, rgb, rescale=1.0):
 
         rgb_scaled = tf.multiply(rgb, rescale, name='rgb_scaled')
 
