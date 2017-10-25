@@ -62,7 +62,8 @@ class Vgg19:
 
         self.data_dict = None
 
-    def pool(self, bottom, name, mode):
+    @staticmethod
+    def pool(bottom, name, mode):
         assert mode in ('max', 'avg')
         if mode == 'max':
             return tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
